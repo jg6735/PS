@@ -30,7 +30,6 @@ public class BOJ_1149_RGB거리 {
 			houses[1] = Integer.parseInt(st.nextToken()); // G
 			houses[2] = Integer.parseInt(st.nextToken()); // B
 			
-			// i번째 집에 조건에 맞는 색을 칠할 때 최소 비용 = i - 1번째 집에서 다른 색을 칠한 비용 + 빨간색 비용
 			dp[i][0] = Math.min(dp[i-1][1], dp[i-1][2]) + houses[0];
 			dp[i][1] = Math.min(dp[i-1][0], dp[i-1][2]) + houses[1];
 			dp[i][2] = Math.min(dp[i-1][0], dp[i-1][1]) + houses[2];
