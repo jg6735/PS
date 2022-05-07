@@ -1,5 +1,5 @@
 # **LCS**
-### 📌 [BOJ G5 9251 LCS(https://www.acmicpc.net/problem/9251)
+### 📌 [BOJ G5 9251 LCS](https://www.acmicpc.net/problem/9251)
 -------------
 ### **✔ 풀이 과정 / 학습한 내용**
 - 최장 공통 부분 수열 문제였는데, 완전탐색으론 안되고, DP로 풀어야 하는 문제였다. 두 문자열의 문자를 비교하면서 
