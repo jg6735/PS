@@ -13,7 +13,7 @@ class Solution {
 
         int index = 0;
         for (int i = (int) begin; i <= end; i++) {
-            if (isPrimeAndGetDivisior(i)) {
+            if (isPrimeAndGetDivisor(i)) {
                 answer[index++] = 1;
             } else {
                 answer[index++] = count;
@@ -23,7 +23,7 @@ class Solution {
         return answer;
     }
 
-    private static boolean isPrimeAndGetDivisior(int number) {
+    private static boolean isPrimeAndGetDivisor(int number) {
         if (number <= 1) {
             return false;
         }
