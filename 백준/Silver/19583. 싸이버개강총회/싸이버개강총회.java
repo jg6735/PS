@@ -6,7 +6,6 @@ import java.util.StringTokenizer;
 public class Main {
 
     private static Set<String> enterSet;
-    private static Set<String> leaveSet;
     private static int S, E, Q;
     private static int answer;
 
@@ -20,10 +19,19 @@ public class Main {
         print();
     }
 
-    private static void solve() {
-        for (String s : enterSet) {
-            if (leaveSet.contains(s)) {
+    private static void solve() throws IOException {
+        String input = "";
+        while ((input = in.readLine()) != null) {
+            st = new StringTokenizer(input);
+
+            int time = strToTime(st.nextToken());
+            String nickname = st.nextToken();
+
+            if (time <= S) {
+                enterSet.add(nickname);
+            } else if (time >= E && time <= Q && (enterSet.contains(nickname))) {
                 answer++;
+                enterSet.remove(nickname);
             }
         }
     }
@@ -41,21 +49,6 @@ public class Main {
         E = strToTime(st.nextToken());
         Q = strToTime(st.nextToken());
         enterSet = new HashSet<>();
-        leaveSet = new HashSet<>();
-
-        String input = "";
-        while ((input = in.readLine()) != null) {
-            st = new StringTokenizer(input);
-
-            int time = strToTime(st.nextToken());
-            String nickname = st.nextToken();
-
-            if (time <= S) {
-                enterSet.add(nickname);
-            } else if (time >= E && time <= Q) {
-                leaveSet.add(nickname);
-            }
-        }
     }
 
     private static void print() throws IOException {
