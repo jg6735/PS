@@ -8,8 +8,7 @@ public class Main {
 
     private static int R, C, T, answer;
     private static AirCleaner airCleaner;
-    private static int[][] map;
-    private static boolean[][] check;
+    private static int[][] map, copiedMap;
 
     private static BufferedReader in;
     private static BufferedWriter out;
@@ -36,23 +35,21 @@ public class Main {
     }
 
     private static void checkSpread() {
-        int[][] temp = copyMap();
+        copyMap();
         for (int r = 0; r < R; r++) {
             for (int c = 0; c < C; c++) {
                 if (hasDust(map[r][c])) {
-                    int spreadCount = spread(r, c, temp[r][c] / 5);
-                    map[r][c] -= (int) (Math.floor((double) temp[r][c] / 5) * spreadCount);
+                    int spreadCount = spread(r, c, copiedMap[r][c] / 5);
+                    map[r][c] -= (int) (Math.floor((double) copiedMap[r][c] / 5) * spreadCount);
                 }
             }
         }
     }
 
-    private static int[][] copyMap() {
-        int[][] temp = new int[R][C];
+    private static void copyMap() {
         for (int r = 0; r < R; r++) {
-            System.arraycopy(map[r], 0, temp[r], 0, C);
+            System.arraycopy(map[r], 0, copiedMap[r], 0, C);
         }
-        return temp;
     }
 
     private static int spread(int r, int c, int dust) {
@@ -71,42 +68,33 @@ public class Main {
     }
 
     private static void clean() {
-        int topR = airCleaner.getTopRow();
-        int topC = airCleaner.getTopCol();
-        int bottomR = airCleaner.getBottomRow();
-        int bottomC = airCleaner.getBottomCol();
+        copyMap();
+        copiedMap[airCleaner.getBottomRow()][airCleaner.getBottomCol()] = 0;
+        copiedMap[airCleaner.getTopRow()][airCleaner.getTopCol()] = 0;
 
-        int[][] temp = copyMap();
-        temp[topR][topC] = 0;
-        temp[bottomR][bottomC] = 0;
-
-        int nextTopR = topR;
-        int nextTopC = topC;
-        int nextBottomR = bottomR;
-        int nextBottomC = bottomC;
+        int[] top = new int[2];
+        int[] bottom = new int[2];
+        top[0] = airCleaner.getTopRow();
+        top[1] = airCleaner.getTopCol();
+        bottom[0] = airCleaner.getBottomRow();
+        bottom[1] = airCleaner.getBottomCol();
         for (int d = 0; d < 4; d++) {
-            while (isAvailable(nextTopR + DR[d], nextTopC + DC[d])) {
-                if (nextTopR + DR[d] == topR && nextTopC + DC[d] == topC) {
-                    map[topR][topC] = -1;
-                    break;
-                }
-
-                map[nextTopR + DR[d]][nextTopC + DC[d]] = temp[nextTopR][nextTopC];
-                nextTopR += DR[d];
-                nextTopC += DC[d];
-            }
-
+            cleanAir(top, airCleaner.getTopRow(), airCleaner.getTopCol(), d);
             int dir = d % 2 == 1 ? (d + 2) % 4 : d;
-            while (isAvailable(nextBottomR + DR[dir], nextBottomC + DC[dir])) {
-                if (nextBottomR + DR[dir] == bottomR && nextBottomC + DC[dir] == bottomC) {
-                    map[bottomR][bottomC] = -1;
-                    break;
-                }
+            cleanAir(bottom, airCleaner.getBottomRow(), airCleaner.getBottomCol(), dir);
+        }
+    }
 
-                map[nextBottomR + DR[dir]][nextBottomC + DC[dir]] = temp[nextBottomR][nextBottomC];
-                nextBottomR += DR[dir];
-                nextBottomC += DC[dir];
+    private static void cleanAir(int[] result, int row, int col, int dir) {
+        while (isAvailable(result[0] + DR[dir], result[1] + DC[dir])) {
+            if (result[0] + DR[dir] == row && result[1] + DC[dir] == col) {
+                map[row][col] = -1;
+                break;
             }
+
+            map[result[0] + DR[dir]][result[1] + DC[dir]] = copiedMap[result[0]][result[1]];
+            result[0] += DR[dir];
+            result[1] += DC[dir];
         }
     }
 
@@ -127,14 +115,12 @@ public class Main {
         C = Integer.parseInt(st.nextToken());
         T = Integer.parseInt(st.nextToken());
         map = new int[R][C];
-        check = new boolean[R][C];
+        copiedMap = new int[R][C];
         for (int r = 0; r < R; r++) {
             st = new StringTokenizer(in.readLine());
             for (int c = 0; c < C; c++) {
                 map[r][c] = Integer.parseInt(st.nextToken());
-                if (map[r][c] > 0) {
-                    check[r][c] = true;
-                } else if (airCleaner == null && map[r][c] == -1) {
+                if (airCleaner == null && map[r][c] == -1) {
                     airCleaner = new AirCleaner(r, c, r + 1, c);
                 }
             }
