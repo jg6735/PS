@@ -21,16 +21,8 @@ public class Main {
     private static void solve() {
         while (true) {
             boolean[][] visited = new boolean[N][N];
-            int cnt = 0;
-            for (int r = 0; r < N; r++) {
-                for (int c = 0; c < N; c++) {
-                    if (!visited[r][c]) {
-                        cnt += search(r, c, visited);
-                    }
-                }
-            }
-
-            if (cnt > 0) {
+            int movedCount = search(visited);
+            if (movedCount > 0) {
                 answer++;
             } else {
                 break;
@@ -38,16 +30,29 @@ public class Main {
         }
     }
 
-    private static int search(int r, int c, boolean[][] visited) {
+    private static int search(boolean[][] visited) {
+        int movedCount = 0;
+        for (int r = 0; r < N; r++) {
+            for (int c = 0; c < N; c++) {
+                if (!visited[r][c]) {
+                    movedCount += move(new Coordinate(r, c), visited);
+                }
+            }
+        }
+
+        return movedCount;
+    }
+
+    private static int move(Coordinate start, boolean[][] visited) {
         Queue<Coordinate> queue = new LinkedList<>();
-        Coordinate start = new Coordinate(r, c);
         queue.add(start);
-        visited[r][c] = true;
-        int sum = map[r][c];
+        visited[start.getR()][start.getC()] = true;
+        int sum = map[start.getR()][start.getC()];
         int count = 1;
 
         List<Coordinate> list = new ArrayList<>();
         list.add(start);
+
         while (!queue.isEmpty()) {
             Coordinate cur = queue.poll();
             int curR = cur.getR();
@@ -67,12 +72,16 @@ public class Main {
                 }
             }
         }
+        
+        if (count == 1) {
+            return 0;
+        } else {
+            for (Coordinate coordinate : list) {
+                map[coordinate.getR()][coordinate.getC()] = sum / count;
+            }
 
-        for (Coordinate coordinate : list) {
-            map[coordinate.getR()][coordinate.getC()] = sum / count;
+            return count;
         }
-
-        return count == 1 ? 0 : count;
     }
 
     private static boolean canOpenLine(int cur, int next) {
