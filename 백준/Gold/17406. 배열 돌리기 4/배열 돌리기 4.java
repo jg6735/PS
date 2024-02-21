@@ -10,6 +10,7 @@ public class Main {
 
     private static int N, M, K, answer;
     private static int[][] arr, op;
+    private static int[] result;
     private static boolean[] isSelected;
 
     private static BufferedReader in;
@@ -27,29 +28,32 @@ public class Main {
 
     private static void dfs(int cnt) {
         if (cnt == K) {
-            getRowMin();
+            int[][] copied = copyArr(arr);
+            for (int idx : result) {
+                rotate(op[idx], copied);
+            }
+
+            getRowMin(copied);
             return;
         }
 
-        int[][] copied = copyArr(arr);
         for (int i = 0; i < K; i++) {
             if (isSelected[i]) {
                 continue;
             }
 
             isSelected[i] = true;
-            rotate(op[i]);
+            result[cnt] = i;
             dfs(cnt + 1);
             isSelected[i] = false;
-            arr = copyArr(copied);
         }
     }
 
-    private static void getRowMin() {
+    private static void getRowMin(int[][] copied) {
         for (int r = 0; r < N; r++) {
             int sum = 0;
             for (int c = 0; c < M; c++) {
-                sum += arr[r][c];
+                sum += copied[r][c];
             }
 
             answer = Math.min(sum, answer);
@@ -65,7 +69,7 @@ public class Main {
         return copied;
     }
 
-    private static void rotate(int[] op) {
+    private static void rotate(int[] op, int[][] copied) {
         int r = op[0];
         int c = op[1];
         int s = op[2];
@@ -76,7 +80,7 @@ public class Main {
         int endC = c + s;
         int curR = startR;
         int curC = startC;
-        int start = arr[curR][curC];
+        int start = copied[curR][curC];
         int count = (endR - startR) / 2;
         int dir = 0;
         while (count > 0) {
@@ -86,9 +90,9 @@ public class Main {
 
             int nextR = curR + DR[dir];
             int nextC = curC + DC[dir];
-            arr[curR][curC] = arr[nextR][nextC];
+            copied[curR][curC] = copied[nextR][nextC];
             if (nextR == startR && nextC == startC) {
-                arr[curR][curC] = start;
+                copied[curR][curC] = start;
                 startR++;
                 startC++;
                 endR--;
@@ -97,7 +101,7 @@ public class Main {
                 curC = startC;
                 dir = 0;
                 count--;
-                start = arr[curR][curC];
+                start = copied[curR][curC];
                 continue;
             }
 
@@ -115,6 +119,7 @@ public class Main {
         arr = new int[N][M];
         op = new int[K][3];
         isSelected = new boolean[K];
+        result = new int[K];
         answer = Integer.MAX_VALUE;
         for (int r = 0; r < N; r++) {
             st = new StringTokenizer(in.readLine());
