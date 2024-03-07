@@ -1,10 +1,12 @@
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Main {
 
     private static int k;
-    private static long max, min;
-    private static int[] numbers;
+    private static List<String> result;
     private static boolean[] isSelected;
     private static char[] ops;
 
@@ -19,34 +21,20 @@ public class Main {
     }
 
     private static void solve() {
-        dfs(0);
-        builder.append(max).append("\n");
-        if (!String.valueOf(min).contains("0")) {
-            builder.append(0);
+        for (int i = 0; i < 10; i++) {
+            isSelected = new boolean[10];
+            isSelected[i] = true;
+            dfs(0, i, Integer.toString(i));
+            isSelected[i] = false;
         }
-        builder.append(min);
+
+        Collections.sort(result);
+        builder.append(result.get(result.size() - 1)).append("\n").append(result.get(0));
     }
 
-    private static void dfs(int cnt) {
-        if (cnt == k + 1) {
-            for (int i = 0; i < k; i++) {
-                char op = ops[i];
-                if (op == '>' && numbers[i] < numbers[i + 1]) {
-                    return;
-                }
-
-                if (op == '<' && numbers[i] > numbers[i + 1]) {
-                    return;
-                }
-            }
-
-            StringBuilder sb = new StringBuilder();
-            for (int number : numbers) {
-                sb.append(number);
-            }
-
-            max = Math.max(Long.parseLong(sb.toString()), max);
-            min = Math.min(Long.parseLong(sb.toString()), min);
+    private static void dfs(int cnt, int start, String num) {
+        if (num.length() == k + 1) {
+            result.add(num);
             return;
         }
 
@@ -55,10 +43,20 @@ public class Main {
                 continue;
             }
 
-            numbers[cnt] = i;
-            isSelected[i] = true;
-            dfs(cnt + 1);
-            isSelected[i] = false;
+            char op = ops[cnt];
+            if (op == '>') {
+                if (start > i) {
+                    isSelected[i] = true;
+                    dfs(cnt + 1, i, num + i);
+                    isSelected[i] = false;
+                }
+            } else {
+                if (start < i) {
+                    isSelected[i] = true;
+                    dfs(cnt + 1, i, num + i);
+                    isSelected[i] = false;
+                }
+            }
         }
     }
 
@@ -67,11 +65,9 @@ public class Main {
         out = new BufferedWriter(new OutputStreamWriter(System.out));
         builder = new StringBuilder();
         k = Integer.parseInt(in.readLine());
-        numbers = new int[k + 1];
+        result = new ArrayList<>();
         ops = new char[k];
         isSelected = new boolean[10];
-        max = Long.MIN_VALUE;
-        min = Long.MAX_VALUE;
         String input = in.readLine();
         for (int i = 0, j = 0; i < k; i++, j += 2) {
             ops[i] = input.charAt(j);
