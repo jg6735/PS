@@ -4,7 +4,7 @@ import java.util.StringTokenizer;
 public class Main {
 
     private static int T, N, X, Y;
-    private static double[] cars, result;
+    private static double myCar;
 
     private static BufferedReader in;
     private static BufferedWriter out;
@@ -24,17 +24,19 @@ public class Main {
             X = Integer.parseInt(st.nextToken());
             Y = Integer.parseInt(st.nextToken());
             st = new StringTokenizer(in.readLine());
-            cars = new double[N];
-            result = new double[N];
 
+            double[] result = new double[N];
             double min = Double.MAX_VALUE;
             int answer = -1;
             for (int i = 0; i < N; i++) {
-                cars[i] = Integer.parseInt(st.nextToken());
-                result[i] = X / cars[i];
-
-                if (i == N - 1 && result[i] < min) {
-                    answer = 0;
+                int speed = Integer.parseInt(st.nextToken());
+                result[i] = (double) X / speed;
+                if (i == N - 1) {
+                    myCar = speed;
+                    if (result[i] < min) {
+                        answer = 0;
+                        break;
+                    }
                 }
 
                 min = Math.min(min, result[i]);
@@ -45,23 +47,23 @@ public class Main {
                 continue;
             }
 
-            int left = 0;
-            int right = Y;
-            while (left <= right) {
-                int mid = (left + right) / 2;
-                if ((X - mid) / cars[N - 1] + 1 >= min) {
-                    left = mid + 1;
-                } else {
-                    right = mid - 1;
-                }
-            }
-
-            if (left > Y) {
-                left = -1;
-            }
-            
-            builder.append(left).append("\n");
+            answer = binarySearch(min);
+            builder.append(answer).append("\n");
         }
+    }
+
+    private static int binarySearch(double min) {
+        int left = 0, right = Y, mid;
+        while (left <= right) {
+            mid = (left + right) / 2;
+            if ((X - mid) / myCar + 1 >= min) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+
+        return left <= Y ? left : -1;
     }
 
     private static void init() throws IOException {
