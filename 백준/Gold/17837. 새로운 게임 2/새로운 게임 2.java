@@ -24,27 +24,13 @@ public class Main {
         int count = 0;
         while (++count <= 1000) {
             for (Piece piece : list) {
-                piece.move(pieces, board);
-
-                if (isGameOver()) {
+                boolean isGameOver = piece.move(pieces, board);
+                if (isGameOver) {
                     answer = count;
                     return;
                 }
             }
-
         }
-    }
-
-    private static boolean isGameOver() {
-        for (int r = 0; r < N; r++) {
-            for (int c = 0; c < N; c++) {
-                if (board[r][c][1] >= 4) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     private static void init() throws IOException {
@@ -166,7 +152,7 @@ public class Main {
             }
         }
 
-        public void move(Piece[][][] pieces, int[][][] board) {
+        public boolean move(Piece[][][] pieces, int[][][] board) {
             int nextR = r + DR[dir];
             int nextC = c + DC[dir];
 
@@ -187,6 +173,8 @@ public class Main {
             } else if (board[nextR][nextC][0] == 1) {
                 moveRed(pieces, board, nextR, nextC);
             }
+
+            return board[r][c][1] >= 4;
         }
     }
 }
