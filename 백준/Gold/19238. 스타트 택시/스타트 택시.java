@@ -169,6 +169,9 @@ public class Main {
                 curC = cur.getCoordinate().getC();
                 curFuel = cur.getFuel();
                 curCount = cur.getCount();
+                if (!pq.isEmpty() && pq.peek().getDistance() != curCount) {
+                    continue;
+                }
 
                 for (Customer customer : list) {
                     int startR = customer.getStart().getR();
@@ -213,14 +216,13 @@ public class Main {
                 curC = cur.getCoordinate().getC();
                 curFuel = cur.getFuel();
                 curCount = cur.getCount();
+                if (curFuel < 0) {
+                    continue;
+                }
 
                 if (curR == customer.getGoal().getR() && curC == customer.getGoal().getC()) {
-                    if (curFuel >= 0) {
-                        arrive(customer.getGoal(), curCount * 2 + curFuel);
-                        return true;
-                    }
-
-                    return false;
+                    arrive(customer.getGoal(), curCount * 2 + curFuel);
+                    return true;
                 }
 
                 for (int d = 0; d < 4; d++) {
