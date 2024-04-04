@@ -1,6 +1,4 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -22,59 +20,10 @@ public class Main {
     }
 
     private static void solve() {
-        List<int[]> list = new ArrayList<>();
+        int[][] result = new int[N][M];
         int size = Math.min(N, M) / 2;
         for (int i = 0; i < size; i++) {
-            int[] temp = new int[(N - i * 2) * 2 + (M - i * 2 - 2) * 2];
-            int r = i;
-            int c = i;
-            int d = 0;
-            temp[0] = arr[r][c];
-            for (int j = 1; j < temp.length; j++) {
-                int nextR = r + DR[d];
-                int nextC = c + DC[d];
-
-                if (nextR < i || nextC < i || nextR >= N - i || nextC >= M - i) {
-                    d = (d + 1) % 4;
-                    nextR = r + DR[d];
-                    nextC = c + DC[d];
-                }
-
-                temp[j] = arr[nextR][nextC];
-                r = nextR;
-                c = nextC;
-            }
-
-            list.add(temp);
-        }
-
-        int[][] result = new int[N][M];
-        for (int i = 0; i < list.size(); i++) {
-            int[] temp = list.get(i);
-            int cnt = R % temp.length;
-            int[] newArr = new int[temp.length];
-            for (int j = 0; j < temp.length; j++) {
-                newArr[j] = temp[(j + cnt) % temp.length];
-            }
-
-            int r = i;
-            int c = i;
-            int d = 0;
-            result[r][c] = newArr[0];
-            for (int j = 1; j < temp.length; j++) {
-                int nextR = r + DR[d];
-                int nextC = c + DC[d];
-
-                if (nextR < i || nextC < i || nextR >= N - i || nextC >= M - i) {
-                    d = (d + 1) % 4;
-                    nextR = r + DR[d];
-                    nextC = c + DC[d];
-                }
-
-                result[nextR][nextC] = newArr[j];
-                r = nextR;
-                c = nextC;
-            }
+            rotate(i, result);
         }
 
         for (int r = 0; r < N; r++) {
@@ -83,6 +32,39 @@ public class Main {
             }
             builder.append("\n");
         }
+    }
+
+    private static void rotate(int i, int[][] result) {
+        int[] array = new int[(N + M - i * 4 - 2) * 2];
+        int length = array.length;
+        int cnt = R % length;
+        int[] dirs = new int[]{i, i, 0};
+        for (int j = 0; j < length; j++) {
+            array[(j - cnt + length) % length] = arr[dirs[0]][dirs[1]];
+            rotateNumber(i, dirs);
+        }
+        
+        for (int number : array) {
+            result[dirs[0]][dirs[1]] = number;
+            rotateNumber(i, dirs);
+        }
+    }
+
+    private static void rotateNumber(int i, int[] dirs) {
+        int nextR = dirs[0] + DR[dirs[2]];
+        int nextC = dirs[1] + DC[dirs[2]];
+        if (isOutside(i, nextR, nextC)) {
+            dirs[2] = (dirs[2] + 1) % 4;
+            nextR = dirs[0] + DR[dirs[2]];
+            nextC = dirs[1] + DC[dirs[2]];
+        }
+
+        dirs[0] = nextR;
+        dirs[1] = nextC;
+    }
+
+    private static boolean isOutside(int i, int nextR, int nextC) {
+        return nextR < i || nextC < i || nextR >= N - i || nextC >= M - i;
     }
 
     private static void init() throws IOException {
