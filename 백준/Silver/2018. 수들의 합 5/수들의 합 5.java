@@ -15,21 +15,18 @@ public class Main {
 
     private static void solve() {
         int left = 1;
-        int right = 2;
-        int sum = left + right;
+        int right = 1;
+        int sum = 1;
 
-        while (left < right && right < N) {
+        while (left <= right) {
             if (sum == N) {
                 answer++;
-                left++;
-                right = left + 1;
-                sum = left + right;
-            } else if (sum < N) {
+            }
+
+            if (sum < N) {
                 sum += ++right;
-            } else {
-                left++;
-                right = left + 1;
-                sum = left + right;
+            } else if (sum >= N) {
+                sum -= left++;
             }
         }
     }
@@ -41,7 +38,7 @@ public class Main {
     }
 
     private static void print() throws IOException {
-        out.write(Integer.toString(answer + 1));
+        out.write(Integer.toString(answer));
         out.flush();
     }
 }
