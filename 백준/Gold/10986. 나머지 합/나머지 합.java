@@ -10,6 +10,8 @@ public class Main {
 
     private static BufferedReader in;
     private static BufferedWriter out;
+    private static StringTokenizer st;
+
 
     public static void main(String[] args) throws IOException {
         init();
@@ -17,31 +19,32 @@ public class Main {
         print();
     }
 
-    private static void solve() {
+    private static void solve() throws IOException {
+        st = new StringTokenizer(in.readLine());
         for (int i = 1; i < N + 1; i++) {
+            sums[i] = (sums[i - 1] + Integer.parseInt(st.nextToken())) % M;
             if (sums[i] == 0) {
                 answer++;
             }
+
+            divided[(int) sums[i]]++;
         }
 
         for (long l : divided) {
-            answer += l * (l - 1) / 2;
+            if (l > 1) {
+                answer += l * (l - 1) / 2;
+            }
         }
     }
 
     private static void init() throws IOException {
         in = new BufferedReader(new InputStreamReader(System.in));
         out = new BufferedWriter(new OutputStreamWriter(System.out));
-        StringTokenizer st = new StringTokenizer(in.readLine());
+        st = new StringTokenizer(in.readLine());
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
         sums = new long[N + 1];
         divided = new int[M];
-        st = new StringTokenizer(in.readLine());
-        for (int i = 1; i < N + 1; i++) {
-            sums[i] = (sums[i - 1] + Integer.parseInt(st.nextToken())) % M;
-            divided[(int) sums[i]]++;
-        }
     }
 
     private static void print() throws IOException {
