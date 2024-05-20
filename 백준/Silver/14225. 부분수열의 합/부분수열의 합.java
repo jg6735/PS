@@ -7,23 +7,24 @@ import java.util.StringTokenizer;
 
 public class Main {
 
+    static final int SIZE = 100_000 * 20 + 1;
     static Set<Integer> set;
 
     public static void main(String[] args) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         int N = Integer.parseInt(in.readLine());
         int[] arr = new int[N];
+        boolean[] result = new boolean[SIZE];
         set = new HashSet<>();
         StringTokenizer st = new StringTokenizer(in.readLine());
         for (int i = 0; i < N; i++) {
             arr[i] = Integer.parseInt(st.nextToken());
         }
 
-        findMinSum(arr, N, 0, 0);
-
+        findMinSum(arr, result, N, 0, 0);
         int answer = 0;
-        for (int i = 1; i <= 100_000 * 20; i++) {
-            if (!set.contains(i)) {
+        for (int i = 1; i < SIZE; i++) {
+            if (!result[i]) {
                 answer = i;
                 break;
             }
@@ -32,13 +33,13 @@ public class Main {
         System.out.print(answer);
     }
 
-    static void findMinSum(int[] arr, int N, int depth, int sum) {
+    static void findMinSum(int[] arr, boolean[] result, int N, int depth, int sum) {
         if (depth == N) {
-            set.add(sum);
+            result[sum] = true;
             return;
         }
 
-        findMinSum(arr, N, depth + 1, sum + arr[depth]);
-        findMinSum(arr, N, depth + 1, sum);
+        findMinSum(arr, result, N, depth + 1, sum + arr[depth]);
+        findMinSum(arr, result, N, depth + 1, sum);
     }
 }
