@@ -15,18 +15,7 @@ public class Main {
 
             int answer = 0;
             for (int i = N; i <= M; i++) {
-                char[] arr = new char[10];
-                String number = Integer.toString(i);
-                boolean check = false;
-                for (int j = 0; j < number.length(); j++) {
-                    arr[number.charAt(j) - '0']++;
-                    if (arr[number.charAt(j) - '0'] > 1) {
-                        check = true;
-                        break;
-                    }
-                }
-
-                if (!check) {
+                if (isDuplicated(i)) {
                     answer++;
                 }
             }
@@ -34,6 +23,19 @@ public class Main {
             builder.append(answer).append("\n");
         }
 
-        System.out.println(builder);
+        System.out.print(builder);
+    }
+
+    static boolean isDuplicated(int number) {
+        int[] arr = new int[10];
+        while (number > 0) {
+            if (++arr[number % 10] > 1) {
+                return false;
+            }
+
+            number /= 10;
+        }
+
+        return true;
     }
 }
