@@ -1,8 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -17,13 +15,18 @@ public class Main {
 
             int answer = 0;
             for (int i = N; i <= M; i++) {
-                Set<Character> set = new HashSet<>();
+                char[] arr = new char[10];
                 String number = Integer.toString(i);
+                boolean check = false;
                 for (int j = 0; j < number.length(); j++) {
-                    set.add(number.charAt(j));
+                    arr[number.charAt(j) - '0']++;
+                    if (arr[number.charAt(j) - '0'] > 1) {
+                        check = true;
+                        break;
+                    }
                 }
 
-                if (set.size() == number.length()) {
+                if (!check) {
                     answer++;
                 }
             }
