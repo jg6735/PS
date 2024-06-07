@@ -4,7 +4,7 @@ import java.util.StringTokenizer;
 public class Main {
 
     private static int N, M, H, answer;
-    private static boolean[][] ladder;
+    private static int[][] ladder;
     private static boolean isFinished;
 
     private static BufferedReader in;
@@ -17,50 +17,52 @@ public class Main {
     }
 
     private static void solve() {
-        for (int i = 0; i <= 3; i++) {
-            answer = i;
-            dfs(1, 0);
-            if (isFinished) {
+        for (int i = 0; i < 4; i++) {
+            if (dfs(0, 1, 1, i)) {
+                answer = i;
                 return;
             }
         }
+
+        answer = -1;
     }
 
-    private static void dfs(int idx, int cnt) {
-        if (isFinished) {
-            return;
+    private static boolean dfs(int cnt, int startR, int startC, int total) {
+        if (cnt == total) {
+            return checkLadder();
         }
 
-        if (answer == cnt) {
-            if (checkLadder()) {
-                isFinished = true;
+        for (int r = startR; r <= H; r++) {
+            int c = 1;
+            if (r == startR) {
+                c = startC;
             }
 
-            return;
-        }
+            while (c < N) {
+                if (ladder[r][c] == 0 && ladder[r][c + 1] == 0) {
+                    ladder[r][c] = 1;
+                    ladder[r][c + 1] = -1;
+                    boolean result = dfs(cnt + 1, r, c + 1, total);
+                    ladder[r][c] = 0;
+                    ladder[r][c + 1] = 0;
 
-        for (int r = idx; r <= H; r++) {
-            for (int c = 1; c < N; c++) {
-                if (ladder[r][c] || ladder[r][c - 1]) {
-                    continue;
+                    if (result) {
+                        return true;
+                    }
                 }
 
-                ladder[r][c] = true;
-                dfs(r, cnt + 1);
-                ladder[r][c] = false;
+                c++;
             }
         }
+
+        return false;
     }
 
     private static boolean checkLadder() {
         for (int c = 1; c <= N; c++) {
             int curC = c;
             for (int r = 1; r <= H; r++) {
-                if (ladder[r][curC]) {
-                    curC++;
-                } else if (ladder[r][curC - 1]) {
-                    curC--;
-                }
+                curC += ladder[r][curC];
             }
 
             if (curC != c) {
@@ -78,18 +80,18 @@ public class Main {
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
         H = Integer.parseInt(st.nextToken());
-        ladder = new boolean[H + 1][N + 1];
+        ladder = new int[H + 1][N + 1];
 
         for (int i = 0; i < M; i++) {
             st = new StringTokenizer(in.readLine());
             int a = Integer.parseInt(st.nextToken());
             int b = Integer.parseInt(st.nextToken());
-            ladder[a][b] = true;
+            ladder[a][b] = 1;
+            ladder[a][b + 1] = -1;
         }
     }
 
     private static void print() throws IOException {
-        answer = isFinished ? answer : -1;
         out.write(Integer.toString(answer));
         out.flush();
     }
