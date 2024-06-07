@@ -17,6 +17,25 @@ public class Main {
     }
 
     private static void solve() {
+        int total = 0;
+        for (int c = 1; c < N; c++) {
+            int cnt = 0;
+            for (int r = 1; r <= H; r++) {
+                if (ladder[r][c] == 1) {
+                    cnt++;
+                }
+            }
+
+            if (cnt % 2 == 1) {
+                total++;
+            }
+        }
+
+        if (total >= 4) {
+            answer = -1;
+            return;
+        }
+
         for (int i = 0; i < 4; i++) {
             if (dfs(0, 1, 1, i)) {
                 answer = i;
