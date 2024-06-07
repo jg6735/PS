@@ -5,6 +5,7 @@ public class Main {
 
     private static int N, M, H, answer;
     private static boolean[][] ladder;
+    private static boolean isFinished;
 
     private static BufferedReader in;
     private static BufferedWriter out;
@@ -16,22 +17,31 @@ public class Main {
     }
 
     private static void solve() {
-        dfs(1, 0);
+        for (int i = 0; i <= 3; i++) {
+            answer = i;
+            dfs(1, 0);
+            if (isFinished) {
+                return;
+            }
+        }
     }
 
     private static void dfs(int idx, int cnt) {
-        if (cnt >= 4) {
+        if (isFinished) {
             return;
         }
 
-        if (checkLadder()) {
-            answer = Math.min(answer, cnt);
+        if (answer == cnt) {
+            if (checkLadder()) {
+                isFinished = true;
+            }
+
             return;
         }
 
         for (int r = idx; r <= H; r++) {
             for (int c = 1; c < N; c++) {
-                if (ladder[r][c] || ladder[r][c + 1] || ladder[r][c - 1]) {
+                if (ladder[r][c] || ladder[r][c - 1]) {
                     continue;
                 }
 
@@ -69,7 +79,6 @@ public class Main {
         M = Integer.parseInt(st.nextToken());
         H = Integer.parseInt(st.nextToken());
         ladder = new boolean[H + 1][N + 1];
-        answer = Integer.MAX_VALUE;
 
         for (int i = 0; i < M; i++) {
             st = new StringTokenizer(in.readLine());
@@ -80,10 +89,7 @@ public class Main {
     }
 
     private static void print() throws IOException {
-        if (answer == Integer.MAX_VALUE) {
-            answer = -1;
-        }
-
+        answer = isFinished ? answer : -1;
         out.write(Integer.toString(answer));
         out.flush();
     }
