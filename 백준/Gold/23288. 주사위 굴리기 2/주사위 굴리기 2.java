@@ -1,228 +1,131 @@
 import java.io.*;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Main {
-
+    private static final int EAST = 0, SOUTH = 1, WEST = 2, NORTH = 3;
     private static final int[] DR = {0, 1, 0, -1};
     private static final int[] DC = {1, 0, -1, 0};
 
-    private static int N, M, K, answer;
+    private static int N, M, K, score;
+    private static int r = 0, c = 0, direction = EAST;
     private static int[][] map;
 
-    private static BufferedReader in;
-    private static BufferedWriter out;
-
     public static void main(String[] args) throws IOException {
-        init();
-        solve();
-        print();
-    }
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(in.readLine());
 
-    private static void solve() {
-        Dice dice = new Dice(1, 6, 4, 3, 5, 2);
-        search(dice, 0, 0, 0, 0, 0);
-    }
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        K = Integer.parseInt(st.nextToken());
 
-    private static void search(Dice dice, int r, int c, int d, int cnt, int sum) {
-        if (cnt == K) {
-            answer = sum;
-            return;
+        map = new int[N][M];
+        for (int i = 0; i < N; i++) {
+            st = new StringTokenizer(in.readLine());
+            for (int j = 0; j < M; j++) {
+                map[i][j] = Integer.parseInt(st.nextToken());
+            }
         }
 
-        int nextR, nextC, nextD;
-        if (!isAvailable(r + DR[d], c + DC[d])) {
-            nextD = (d + 2) % 4;
-        } else {
-            nextD = d;
+        Dice dice = new Dice();
+        for (int i = 0; i < K; i++) {
+            move(dice);
         }
 
-        nextR = r + DR[nextD];
-        nextC = c + DC[nextD];
-        roll(dice, nextD);
-        int score = bfs(nextR, nextC, new boolean[N][M]);
+        System.out.print(score);
+    }
+
+    private static void move(Dice dice) {
+        int nextR = r + DR[direction];
+        int nextC = c + DC[direction];
+
+        if (!isIn(nextR, nextC)) {
+            direction = (direction + 2) % 4;
+            nextR = r + DR[direction];
+            nextC = c + DC[direction];
+        }
+
+        dice.roll(direction);
+
+        r = nextR;
+        c = nextC;
+        score += getScore(r, c);
+
         int bottom = dice.getBottom();
-
-        if (bottom > map[nextR][nextC]) {
-            nextD = (nextD + 1) % 4;
-        } else if (bottom < map[nextR][nextC]) {
-            nextD = (nextD + 3) % 4;
+        int diceValue = map[r][c];
+        if (bottom > diceValue) {
+            direction = (direction + 1) % 4;
+        } else if (bottom < diceValue) {
+            direction = (direction + 3) % 4;
         }
-
-        search(dice, nextR, nextC, nextD, cnt + 1, sum + score);
     }
 
-    private static int bfs(int r, int c, boolean[][] visited) {
-        Queue<Coordinate> queue = new LinkedList<>();
-        queue.add(new Coordinate(r, c, 1));
-        visited[r][c] = true;
-        int score = map[r][c];
+    private static boolean isIn(int r, int c) {
+        return r >= 0 && r < N && c >= 0 && c < M;
+    }
+
+    private static int getScore(int startR, int startC) {
+        boolean[][] visited = new boolean[N][M];
+        Queue<int[]> queue = new LinkedList<>();
+        queue.add(new int[]{startR, startC});
+        visited[startR][startC] = true;
+
+        int start = map[startR][startC];
+        int count = 1;
 
         while (!queue.isEmpty()) {
-            Coordinate cur = queue.poll();
-            int curR = cur.getR();
-            int curC = cur.getC();
-            int curCount = cur.getCount();
+            int[] cur = queue.poll();
+            int curR = cur[0];
+            int curC = cur[1];
 
-            for (int d = 0; d < 4; d++) {
-                int nextR = curR + DR[d];
-                int nextC = curC + DC[d];
+            for (int i = 0; i < 4; i++) {
+                int nextR = curR + DR[i];
+                int nextC = curC + DC[i];
 
-                if (isAvailable(nextR, nextC) && !visited[nextR][nextC] && map[nextR][nextC] == map[r][c]) {
-                    queue.add(new Coordinate(nextR, nextC, curCount + 1));
+                if (isIn(nextR, nextC) && !visited[nextR][nextC] && map[nextR][nextC] == start) {
                     visited[nextR][nextC] = true;
-                    score += map[nextR][nextC];
+                    queue.add(new int[]{nextR, nextC});
+                    count++;
                 }
             }
         }
 
-        return score;
-    }
-
-    private static void roll(Dice dice, int dir) {
-        int top = dice.getTop();
-        int bottom = dice.getBottom();
-        int left = dice.getLeft();
-        int right = dice.getRight();
-        int front = dice.getFront();
-        int back = dice.getBack();
-
-        if (dir == 0) {
-            dice.setRight(top);
-            dice.setBottom(right);
-            dice.setLeft(bottom);
-            dice.setTop(left);
-        } else if (dir == 1) {
-            dice.setFront(top);
-            dice.setBottom(front);
-            dice.setBack(bottom);
-            dice.setTop(back);
-        } else if (dir == 2) {
-            dice.setLeft(top);
-            dice.setBottom(left);
-            dice.setRight(bottom);
-            dice.setTop(right);
-        } else {
-            dice.setBack(top);
-            dice.setBottom(back);
-            dice.setFront(bottom);
-            dice.setTop(front);
-        }
-    }
-
-    private static boolean isAvailable(int r, int c) {
-        return r >= 0 && c >= 0 && r < N && c < M;
-    }
-
-    private static void init() throws IOException {
-        in = new BufferedReader(new InputStreamReader(System.in));
-        out = new BufferedWriter(new OutputStreamWriter(System.out));
-        StringTokenizer st = new StringTokenizer(in.readLine());
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
-        K = Integer.parseInt(st.nextToken());
-        map = new int[N][M];
-        for (int r = 0; r < N; r++) {
-            st = new StringTokenizer(in.readLine());
-            for (int c = 0; c < M; c++) {
-                map[r][c] = Integer.parseInt(st.nextToken());
-            }
-        }
-    }
-
-    private static void print() throws IOException {
-        out.write(Integer.toString(answer));
-        out.flush();
-    }
-
-    private static class Coordinate {
-        private int r;
-        private int c;
-        private int count;
-
-        public Coordinate(int r, int c, int count) {
-            this.r = r;
-            this.c = c;
-            this.count = count;
-        }
-
-        public int getR() {
-            return r;
-        }
-
-        public int getC() {
-            return c;
-        }
-
-        public int getCount() {
-            return count;
-        }
+        return start * count;
     }
 
     private static class Dice {
-        private int top;
-        private int bottom;
-        private int left;
-        private int right;
-        private int front;
-        private int back;
+        private int top = 1, bottom = 6, left = 4, right = 3, front = 5, back = 2;
 
-        public Dice(int top, int bottom, int left, int right, int front, int back) {
-            this.top = top;
-            this.bottom = bottom;
-            this.left = left;
-            this.right = right;
-            this.front = front;
-            this.back = back;
-        }
-
-        public int getTop() {
-            return top;
-        }
-
-        public void setTop(int top) {
-            this.top = top;
+        public void roll(int dir) {
+            int temp;
+            if (dir == EAST) {
+                temp = top;
+                top = left;
+                left = bottom;
+                bottom = right;
+                right = temp;
+            } else if (dir == SOUTH) {
+                temp = top;
+                top = back;
+                back = bottom;
+                bottom = front;
+                front = temp;
+            } else if (dir == WEST) {
+                temp = top;
+                top = right;
+                right = bottom;
+                bottom = left;
+                left = temp;
+            } else if (dir == NORTH) {
+                temp = top;
+                top = front;
+                front = bottom;
+                bottom = back;
+                back = temp;
+            }
         }
 
         public int getBottom() {
             return bottom;
-        }
-
-        public void setBottom(int bottom) {
-            this.bottom = bottom;
-        }
-
-        public int getLeft() {
-            return left;
-        }
-
-        public void setLeft(int left) {
-            this.left = left;
-        }
-
-        public int getRight() {
-            return right;
-        }
-
-        public void setRight(int right) {
-            this.right = right;
-        }
-
-        public int getFront() {
-            return front;
-        }
-
-        public void setFront(int front) {
-            this.front = front;
-        }
-
-        public int getBack() {
-            return back;
-        }
-
-        public void setBack(int back) {
-            this.back = back;
         }
     }
 }
