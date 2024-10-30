@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -10,26 +9,29 @@ public class Main {
         StringTokenizer st = new StringTokenizer(in.readLine());
         int N = Integer.parseInt(st.nextToken());
         int H = Integer.parseInt(st.nextToken());
-        int[] bottom = new int[N / 2];
-        int[] top = new int[N / 2];
+        int[] bottom = new int[H + 1];
+        int[] top = new int[H + 1];
         for (int i = 0; i < N / 2; i++) {
-            bottom[i] = Integer.parseInt(in.readLine());
-            top[i] = Integer.parseInt(in.readLine());
+            bottom[Integer.parseInt(in.readLine())]++;
+            top[Integer.parseInt(in.readLine())]++;
         }
 
-        Arrays.sort(top);
-        Arrays.sort(bottom);
+        for (int h = H - 1; h >= 1; h--) {
+            bottom[h] += bottom[h + 1];
+            top[h] += top[h + 1];
+        }
 
         int min = Integer.MAX_VALUE;
         int minCount = 0;
-        for (int h = 1; h <= H; h++) {
-            int bottomCount = N / 2 - search(h, bottom, N);
-            int topCount = N / 2 - search(H - h + 1, top, N);
-            int count = bottomCount + topCount;
-            if (count < min) {
-                min = count;
+
+        for (int h = H; h >= 1; h--) {
+            int bottomCount = bottom[h];
+            int topCount = top[H - h + 1];
+            int total = bottomCount + topCount;
+            if (total < min) {
+                min = total;
                 minCount = 1;
-            } else if (count == min) {
+            } else if (total == min) {
                 minCount++;
             }
         }
@@ -37,20 +39,5 @@ public class Main {
         StringBuilder builder = new StringBuilder();
         builder.append(min).append(" ").append(minCount);
         System.out.print(builder);
-    }
-
-    private static int search(int target, int[] arr, int N) {
-        int left = 0;
-        int right = N / 2;
-        while (left < right) {
-            int mid = (left + right) / 2;
-            if (arr[mid] < target) {
-                left = mid + 1;
-            } else {
-                right = mid;
-            }
-        }
-
-        return left;
     }
 }
