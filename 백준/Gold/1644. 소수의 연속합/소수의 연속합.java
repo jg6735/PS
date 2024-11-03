@@ -8,9 +8,21 @@ public class Main {
     public static void main(String[] args) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         int N = Integer.parseInt(in.readLine());
+
+        boolean[] arr = new boolean[N + 1];
+        arr[0] = true;
+        arr[1] = true;
+        for (int i = 2; i * i <= N; i++) {
+            if (!arr[i]) {
+                for (int j = i * i; j <= N; j += i) {
+                    arr[j] = true;
+                }
+            }
+        }
+
         List<Integer> primes = new ArrayList<>();
         for (int i = 2; i <= N; i++) {
-            if (isPrime(i)) {
+            if (!arr[i]) {
                 primes.add(i);
             }
         }
@@ -27,26 +39,12 @@ public class Main {
                 if (sum == N) {
                     answer++;
                 }
-                
+
                 sum -= primes.get(left);
                 left++;
             }
         }
 
         System.out.print(answer);
-    }
-
-    private static boolean isPrime(int n) {
-        if (n < 2) {
-            return false;
-        }
-
-        for (int i = 2; i <= Math.sqrt(n); i++) {
-            if (n % i == 0) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }
