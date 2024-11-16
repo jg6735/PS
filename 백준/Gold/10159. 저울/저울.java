@@ -1,49 +1,66 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class Main {
 
     private static int N, M;
-    private static boolean[][] graph;
+    private static List<Integer>[] heavyList, lightList;
+    private static boolean[] visited;
+    private static int heavyCount, lightCount;
 
     public static void main(String[] args) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         N = Integer.parseInt(in.readLine());
         M = Integer.parseInt(in.readLine());
-        graph = new boolean[N + 1][N + 1];
+        heavyList = new ArrayList[N + 1];
+        lightList = new ArrayList[N + 1];
+        for (int i = 1; i <= N; i++) {
+            heavyList[i] = new ArrayList<>();
+            lightList[i] = new ArrayList<>();
+        }
 
         StringTokenizer st;
         for (int i = 0; i < M; i++) {
             st = new StringTokenizer(in.readLine());
-            int a = Integer.parseInt(st.nextToken());
-            int b = Integer.parseInt(st.nextToken());
-            graph[a][b] = true;
-        }
-
-        for (int k = 1; k <= N; k++) {
-            for (int i = 1; i <= N; i++) {
-                for (int j = 1; j <= N; j++) {
-                    if (graph[i][k] && graph[k][j]) {
-                        graph[i][j] = true;
-                    }
-                }
-            }
+            int heavy = Integer.parseInt(st.nextToken());
+            int light = Integer.parseInt(st.nextToken());
+            heavyList[light].add(heavy);
+            lightList[heavy].add(light);
         }
 
         StringBuilder builder = new StringBuilder();
         for (int i = 1; i <= N; i++) {
-            int count = 0;
-            for (int j = 1; j <= N; j++) {
-                if (i != j && !graph[i][j] && !graph[j][i]) {
-                    count++;
-                }
-            }
+            visited = new boolean[N + 1];
+            heavyCount = 0;
+            dfs(i, heavyList);
 
-            builder.append(count).append("\n");
+            visited = new boolean[N + 1];
+            lightCount = 0;
+            dfs(i, lightList);
+
+            int answer = N - 1 - heavyCount - lightCount;
+            builder.append(answer).append("\n");
         }
 
         System.out.print(builder);
+    }
+
+    private static void dfs(int i, List<Integer>[] list) {
+        visited[i] = true;
+        for (int next : list[i]) {
+            if (!visited[next]) {
+                if (list == heavyList) {
+                    heavyCount++;
+                } else {
+                    lightCount++;
+                }
+
+                dfs(next, list);
+            }
+        }
     }
 }
